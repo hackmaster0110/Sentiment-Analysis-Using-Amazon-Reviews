@@ -2,40 +2,29 @@ from packs import *
 
 
 class SentimentAnalyser():
-    """Short summary.
+    """Class providing variaous functions for sentiment analysis.
 
     Parameters
     ----------
-    **kwargs : type
-        Description of parameter `**kwargs`.
+    valid arguments : 'doc','regex','func_string','funcstr_args','remove_urls','Clean'
 
-    Attributes
+    Attributes used in instantiation
     ----------
-    __dict__ : type
-        Description of attribute `__dict__`.
-    doc : type
-        Description of attribute `doc`.
-    func_string : type
-        Description of attribute `func_string`.
-    funcstr_args : type
-        Description of attribute `funcstr_args`.
+    Clean : True by default,Removes punctuation,lowers all letters,removes addition white spaces between words
+    doc : String
+        Sting to be processed
+    func_string : Function
+        Callable obj that process input string and returns a new string 
+    funcstr_args : Dictionary 
+        Arguments for func_string
+    regex : Regex pattern 
+        Currently not implemented    
+    remove_urls : Boolean
+        Remove urls from string if True
 
     """
     def __init__(self,**kwargs):
-        """Short summary.
-
-        Parameters
-        ----------
-        **kwargs : type
-            Description of parameter `**kwargs`.
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        valid_keys = {'doc','regex','rewrite_new','func_string','funcstr_args','remove_urls','Clean'}
+        valid_keys = {'doc','regex','func_string','funcstr_args','remove_urls','Clean'}
         self.__dict__.update((k,v) for k,v in kwargs.items() if k in valid_keys)
         if 'doc' in self.__dict__:
             if len(self.doc.strip()) != 0:
@@ -61,8 +50,8 @@ class SentimentAnalyser():
 
         Returns
         -------
-        type
-            Description of returned object.
+        type String
+            Returns processed string
 
         """
         return self.doc    
@@ -71,8 +60,8 @@ class SentimentAnalyser():
 
         Returns
         -------
-        type
-            Description of returned object.
+        type Count object
+            Count object containing count of each word in the string.
 
         """
         tokens = self.doc.split()

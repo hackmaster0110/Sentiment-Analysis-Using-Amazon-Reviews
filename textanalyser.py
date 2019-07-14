@@ -1,7 +1,7 @@
 from packs import *
 
 
-class SentimentAnalyser():
+class TextProcessor():
     """Class providing variaous functions for sentiment analysis.
 
     Parameters
@@ -104,7 +104,7 @@ def csv_read_modifiy(filename,encoding = "ISO-8859-1"):
             writer = csv.writer(f1, delimiter=',')
             for line in tqdm(lines):
                 row = []
-                cleaned = SentimentAnalyser(doc = line[2],func_string = remove_words_startingwith,remove_urls = True).get_string()
+                cleaned = TextProcessor(doc = line[2],func_string = remove_words_startingwith,remove_urls = True).get_string()
                 if cleaned:
                     row.append(cleaned)
                     row.append(line[0])
@@ -135,7 +135,7 @@ def count_modifier(filename,encoding = "ISO-8859-1"):
     with open(filename,'r',encoding = encoding) as f:
         lines = csv.reader(f)
         for line in tqdm(lines):
-            count = SentimentAnalyser(doc = line[0],Clean = False).get_word_count()
+            count = TextProcessor(doc = line[0],Clean = False).get_word_count()
             Net_Count.update(count)
         with open('dumped_counts','wb') as f:
             pickle.dump(Net_Count,f)    
@@ -163,7 +163,7 @@ def count_modifier_rapid(filename,header=None,encoding = "ISO-8859-1"):
     Net_Count = Counter()
     csv_file = pd.read_csv(filename,encoding = encoding,header = header,engine = 'c')
     for line in tqdm(csv_file[0]):
-        count = SentimentAnalyser(doc = line,Clean = False).get_word_count()
+        count = TextProcessor(doc = line,Clean = False).get_word_count()
         Net_Count.update(count)
     with open('dumped_counts','wb') as f:
         pickle.dump(Net_Count,f)    
@@ -218,7 +218,7 @@ def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
         with open(filename,'r',encoding = encoding) as f1:
             lines = csv.reader(f1)
             for line in tqdm(lines):
-                whole_feature.append(SentimentAnalyser(doc = line[0],Clean = False).encode_words(vocab_to_int_dict))
+                whole_feature.append(TextProcessor(doc = line[0],Clean = False).encode_words(vocab_to_int_dict))
                 whole_label.append(int(line[1]))
             with open('encoded_wrds_labels','wb') as f2:
                 whole['feature'] = whole_feature

@@ -1,22 +1,20 @@
 
-def remove_words_startingwith(sentence,*kwargs):
-    """Short summary.
+def remove_words_startingwith(sentence,*args):
+    """Function for removing words starting with particular characters
 
     Parameters
     ----------
-    sentence : type
-        Description of parameter `sentence`.
-    *kwargs : type
-        Description of parameter `*kwargs`.
-
+    sentence : String
+        String to be processed
+    
     Returns
     -------
-    type
-        Description of returned object.
+    type String
+        Processed string 
 
     """
     valid_keys = {'remove_char':'@'}
-    for lst in kwargs:
+    for lst in args:
         for dic in lst:
             for key,val in dic.items():
                 if key in valid_keys:

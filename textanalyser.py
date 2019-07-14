@@ -46,7 +46,7 @@ class SentimentAnalyser():
             else:
                 return ''        
     def get_string(self):
-        """Short summary.
+        """Method for obtaining the processed string
 
         Returns
         -------
@@ -56,7 +56,7 @@ class SentimentAnalyser():
         """
         return self.doc    
     def get_word_count(self):
-        """Short summary.
+        """Method for obtaining word count for each words in a string
 
         Returns
         -------
@@ -68,24 +68,35 @@ class SentimentAnalyser():
         self.count = Counter(tokens)    
         return self.count
     def encode_words(self,vocab_to_int_dict):
+        """Method for encoding the words in a string using a list of integers 
+
+        Parameters
+        ----------
+        vocab_to_int_dict : Dictionary
+            Dictionary consisting of word as key and integer as value
+
+        Returns
+        -------
+        type list
+            Returns string as list of integers
+
+        """
         return [vocab_to_int_dict[wrd] for wrd in self.doc.split()]
 
 
 def csv_read_modifiy(filename,encoding = "ISO-8859-1"):
-    """Short summary.
+    """Function for cleaning csv file and preprocessing,then writes new file
 
     Parameters
     ----------
-    filename : type
-        Description of parameter `filename`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
+    filename : String
+        Name of the csv file
+    encoding: String
+        Encoding used in file
+    
+        
 
     """
-    # one_hot_dic = {'4':1,'0':0}
     with open(filename,'r',encoding = encoding) as f:
         lines = csv.reader(f)
         new_name = filename.split('/')[-1]
@@ -105,19 +116,19 @@ def csv_read_modifiy(filename,encoding = "ISO-8859-1"):
 
 # For very large file
 def count_modifier(filename,encoding = "ISO-8859-1"):        
-    """Short summary.
+    """Function for counting each words in whole csv file(cleaned) and dumps using pickle 
 
     Parameters
     ----------
-    filename : type
-        Description of parameter `filename`.
-    encoding : type
-        Description of parameter `encoding`.
+    filename : string
+        Name of csv file
+    encoding : string
+        Encoding of the csv file
 
     Returns
     -------
-    type
-        Description of returned object.
+    type Counter object
+        Contains count of each words in whole csv file
 
     """
     Net_Count = Counter()
@@ -130,7 +141,7 @@ def count_modifier(filename,encoding = "ISO-8859-1"):
             pickle.dump(Net_Count,f)    
         return Net_Count    
             
-#Faster,but uses more ram as it loads whole file,not suitable for very large files 
+#Same as count_modifier,but faster,but uses more ram as it loads whole file,not suitable for very large files 
 def count_modifier_rapid(filename,header=None,encoding = "ISO-8859-1"):        
     """Short summary.
 
@@ -159,17 +170,17 @@ def count_modifier_rapid(filename,header=None,encoding = "ISO-8859-1"):
     return Net_Count            
             
 def vocab_to_int(count_dump_file):
-    """Short summary.
+    """Function for encoding word using integer.Uses count of each words in whole file.Dumps encoding for each word in a dictionary
 
     Parameters
     ----------
-    count_dump_file : type
-        Description of parameter `count_dump_file`.
+    count_dump_file : String
+        Name of dumped count file obtained by using count_modifier function
 
     Returns
     -------
-    type
-        Description of returned object.
+    type Dictionary
+        Integer encoding for all unique words in file
 
     """
     with open(count_dump_file, 'rb') as f:
@@ -181,6 +192,24 @@ def vocab_to_int(count_dump_file):
     return vocab_to_int            
                             
 def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
+    """Function for encoding whole file using integers with dictionary dumped by vocab_to_int function 
+    and dumps featues and labels using pickle
+    
+    Parameters
+    ----------
+    vocab_to_int_dump : String
+        Name of dumped dictionary obtained by executing vocab_to_int function 
+    filename : String
+        Name of csv file
+    encoding : String
+        Encoding used in the csv file
+
+    Returns
+    -------
+    type Dictionary
+        Dictionary consisting of encoded features and their respective labels
+
+    """
     whole_feature = []
     whole_label = []
     whole = {}

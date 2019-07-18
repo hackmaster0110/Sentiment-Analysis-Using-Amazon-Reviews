@@ -10,7 +10,8 @@ class TextProcessor():
 
     Attributes used in instantiation
     ----------
-    Clean : True by default,Removes punctuation,lowers all letters,removes addition white spaces between words
+    Clean : Boolean
+        True by default,Removes punctuation,lowers all letters,removes addition white spaces between words
     doc : String
         Sting to be processed
     func_string : Function
@@ -82,6 +83,7 @@ class TextProcessor():
 
         """
         return [vocab_to_int_dict[wrd] for wrd in self.doc.split()]
+
 
 
 def csv_read_modifiy(filename,encoding = "ISO-8859-1"):

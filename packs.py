@@ -13,4 +13,3 @@ from tqdm import tqdm
 from collections import Counter,defaultdict
 import pickle
 import pandas as pd
-import tensorflow as tf

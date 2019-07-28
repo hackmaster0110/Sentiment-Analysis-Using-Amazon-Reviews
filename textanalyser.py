@@ -230,7 +230,7 @@ def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
     
     
 
-def skipgram_bulk(encoded_dump,window_size):
+def center_word_context_word_extractor(encoded_dump,window_size):
     """Function for preprocessing word embedding data
     write center word and corresponding context word to file
     

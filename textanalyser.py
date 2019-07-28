@@ -226,5 +226,33 @@ def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
                 whole['feature'] = whole_feature
                 whole['label'] = whole_label
                 pickle.dump(whole,f2)      
-    return whole    
+    return whole  
+    
+    
+
+def skipgram_bulk(encoded_dump,window_size):
+    """Function for preprocessing word embedding data
+    write center word and corresponding context word to file
+    
+    Parameters
+    ----------
+    encoded_dump : pickle file
+        encoded string list
+    window_size : integer
+        Size of window
+
+ 
+    
+
+    """
+    final = []
+    with open(encoded_dump, 'rb') as f:
+        whole = pickle.load(f)
+    with open('skipgram_context.txt','w') as f1:
+        for encoded_sentence in tqdm(whole['feature']):
+            out = skipgram(window_size,encoded_sentence)
+            if out is not None:
+                json_string = json.dumps(out) + '\n'
+                f1.write(json_string)
+
                 

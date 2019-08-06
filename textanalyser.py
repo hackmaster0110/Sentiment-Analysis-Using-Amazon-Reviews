@@ -255,4 +255,25 @@ def center_word_context_word_extractor(encoded_dump,window_size):
                 json_string = json.dumps(out) + '\n'
                 f1.write(json_string)
 
-                
+def reverse_vocab_to_int(vocab_to_int_dump):
+    """Reversing vocab to int mapping to create  int to vocab mapping
+
+    Parameters
+    ----------
+    vocab_to_int_dump : Pickle dump 
+        Pickle dump of vocabulary to integer mapping
+
+    Returns
+    -------
+    type Dictionary
+        Integer to vocabulary mapping
+
+    """
+    with open(vocab_to_int_dump,'rb') as f:
+        vocab_to_int = pickle.load(f)
+    int_to_vocab = reverse_dict(vocab_to_int)
+    with open('int_to_vocab','wb') as f1:
+        pickle.dump(int_to_vocab,f1)
+
+
+                    

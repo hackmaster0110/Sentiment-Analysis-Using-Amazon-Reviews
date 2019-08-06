@@ -1,3 +1,5 @@
+import os
+from tqdm import tqdm
 
 def remove_words_startingwith(sentence,*args):
     """Function for removing words starting with particular characters
@@ -107,6 +109,61 @@ def skipgram(window_size,arr):
     
     return rel
 
+
+def reverse_dict(dict):
+    """Function to reverse dictionary(Only dictionary with unique keys and values)
+
+    Parameters
+    ----------
+    dict : Dictionary
+        Dictionary to be reversed
+
+    Returns
+    -------
+    type Dictionary
+        Reversed dictionary
+
+    """
+    return {v: k for k, v in dict.items()}
+    
+    
             
+def split_to_batch(size_per_batch,file):
+    """Splits file to batches
+
+    Parameters
+    ----------
+    size_per_batch : integer
+        Number of lines in one batch
+    file : string
+        Name of file which is to be splited into batches
+
+    Returns
+    -------
+    type integer
+        Returns 0 if succeeded
+
+    """
+    batch_num = 1
+    current_row = 1
+    if not os.path.exists('batches'):
+        os.makedirs('batches')
+    with open(file,'r') as f:
+        while True:
+            f1 = open('batches/batch' + str(batch_num) + '_' + file,'w')
+            while current_row <= size_per_batch: 
+                line = next(f,'end')
+                if line == 'end':
+                    return 0
+                else:    
+                    f1.write(line)
+                current_row += 1
+                if current_row > size_per_batch:
+                    f1.close()
+                    batch_num += 1
+            current_row = 1
+                
             
-            
+                    
+                    
+                    

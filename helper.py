@@ -1,5 +1,9 @@
 import os
 from tqdm import tqdm
+import json
+import glob
+import numpy as np
+import pickle
 
 def remove_words_startingwith(sentence,*args):
     """Function for removing words starting with particular characters
@@ -128,42 +132,104 @@ def reverse_dict(dict):
     
     
             
-def split_to_batch(size_per_batch,file):
-    """Splits file to batches
+# def split_to_batch(size_per_batch,file):
+#     """Splits file to batches
+# 
+#     Parameters
+#     ----------
+#     size_per_batch : integer
+#         Number of lines in one batch
+#     file : string
+#         Name of file which is to be splited into batches
+# 
+#     Returns
+#     -------
+#     type integer
+#         Returns 0 if succeeded
+# 
+#     """
+#     batch_num = 1
+#     current_row = 1
+#     if not os.path.exists('batches'):
+#         os.makedirs('batches')
+#     with open(file,'r') as f:
+#         while True:
+#             f1 = open('batches/batch' + str(batch_num) + '_' + file,'w')
+#             while current_row <= size_per_batch: 
+#                 line = next(f,'end')
+#                 if line == 'end':
+#                     return 0
+#                 else:    
+#                     f1.write(line)
+#                 current_row += 1
+#                 if current_row > size_per_batch:
+#                     f1.close()
+#                     batch_num += 1
+#             current_row = 1
+# 
+
+def center_word_context_word_extractor_and_batcher(encoded_dump,window_size,batch_size,vocab_size,dtype):
+    """Function for preprocessing word embedding data
+    write center word and corresponding context word to file
+    
+    Parameters
+    ----------
+    encoded_dump : pickle file
+        encoded string list
+    window_size : integer
+        Size of window
+
+     """
+    if not os.path.exists('npbatches'):
+        os.makedirs('npbatches')
+    with open(encoded_dump, 'rb') as f:
+        whole = pickle.load(f)
+    count = 1
+    x,y = [],[]
+    for encoded_sentence in tqdm(whole['feature']):
+        out = skipgram(window_size,encoded_sentence)
+        
+        if out is not None:
+            for index,sub_arr in enumerate(out):
+                if len(x) == len(y):
+                    if len(x) < batch_size:
+                        x.append(to_one_hot([sub_arr[0]],vocab_size,dtype))
+                        y.append(to_one_hot(sub_arr[1],vocab_size,dtype))
+                    else:    
+                        np.save('npbatches/features'+str(count),np.asarray(x))
+                        np.save('npbatches/label'+str(count),np.asarray(y))
+                        count += 1
+                        x,y = [],[]
+                        x.append(to_one_hot([sub_arr[0]],vocab_size,dtype))
+                        y.append(to_one_hot(sub_arr[1],vocab_size,dtype))
+                else:
+                    return 'Error,Unequal feature and label size'
+    if len(x) > 0:
+        if len(x) == len(y):
+            np.save('npbatches/features'+str(count),np.asarray(x))
+            np.save('npbatches/label'+str(count),np.asarray(y))                
+    return 0
+
+def to_one_hot(word_id_list,vocab_size,dtype):
+    """Short summary.
 
     Parameters
     ----------
-    size_per_batch : integer
-        Number of lines in one batch
-    file : string
-        Name of file which is to be splited into batches
+    word_id_list : type
+        Description of parameter `word_id_list`.
+    vocab_size : type
+        Description of parameter `vocab_size`.
 
     Returns
     -------
-    type integer
-        Returns 0 if succeeded
+    type
+        Description of returned object.
 
     """
-    batch_num = 1
-    current_row = 1
-    if not os.path.exists('batches'):
-        os.makedirs('batches')
-    with open(file,'r') as f:
-        while True:
-            f1 = open('batches/batch' + str(batch_num) + '_' + file,'w')
-            while current_row <= size_per_batch: 
-                line = next(f,'end')
-                if line == 'end':
-                    return 0
-                else:    
-                    f1.write(line)
-                current_row += 1
-                if current_row > size_per_batch:
-                    f1.close()
-                    batch_num += 1
-            current_row = 1
-                
-            
+    temp = np.zeros(vocab_size,dtype = dtype)
+    for id in word_id_list:
+        temp[id-1] = 1
+    return temp
                     
                     
                     

@@ -24,7 +24,7 @@ class TextProcessor():
         Remove urls from string if True
 
     """
-    def __init__(self,**kwargs):
+    def filter(self,**kwargs):
         valid_keys = {'doc','regex','func_string','funcstr_args','remove_urls','Clean'}
         self.__dict__.update((k,v) for k,v in kwargs.items() if k in valid_keys)
         if 'doc' in self.__dict__:
@@ -102,11 +102,13 @@ def csv_read_modifiy(filename,encoding = "ISO-8859-1"):
     with open(filename,'r',encoding = encoding) as f:
         lines = csv.reader(f)
         new_name = filename.split('/')[-1]
+        cleaner = TextProcessor()
+        
         with open('modified'+new_name,'w',encoding = encoding) as f1:
             writer = csv.writer(f1, delimiter=',')
             for line in tqdm(lines):
                 row = []
-                cleaned = TextProcessor(doc = line[2],func_string = remove_words_startingwith,remove_urls = True).get_string()
+                cleaned = cleaner.filter(doc = line[2],func_string = remove_words_startingwith,remove_urls = True).get_string()
                 if cleaned:
                     row.append(cleaned)
                     row.append(line[0])
@@ -114,62 +116,9 @@ def csv_read_modifiy(filename,encoding = "ISO-8859-1"):
                 else:
                     continue    
                 
-                    
+    return 0                
 
-# For very large file
-def count_modifier(filename,encoding = "ISO-8859-1"):        
-    """Function for counting each words in whole csv file(cleaned) and dumps using pickle 
-
-    Parameters
-    ----------
-    filename : string
-        Name of csv file
-    encoding : string
-        Encoding of the csv file
-
-    Returns
-    -------
-    type Counter object
-        Contains count of each words in whole csv file
-
-    """
-    Net_Count = Counter()
-    with open(filename,'r',encoding = encoding) as f:
-        lines = csv.reader(f)
-        for line in tqdm(lines):
-            count = TextProcessor(doc = line[0],Clean = False).get_word_count()
-            Net_Count.update(count)
-        with open('dumped_counts','wb') as f:
-            pickle.dump(Net_Count,f)    
-        return Net_Count    
             
-#Same as count_modifier,but faster,but uses more ram as it loads whole file,not suitable for very large files 
-def count_modifier_rapid(filename,header=None,encoding = "ISO-8859-1"):        
-    """Short summary.
-
-    Parameters
-    ----------
-    filename : type
-        Description of parameter `filename`.
-    header : type
-        Description of parameter `header`.
-    encoding : type
-        Description of parameter `encoding`.
-
-    Returns
-    -------
-    type
-        Description of returned object.
-
-    """
-    Net_Count = Counter()
-    csv_file = pd.read_csv(filename,encoding = encoding,header = header,engine = 'c')
-    for line in tqdm(csv_file[0]):
-        count = TextProcessor(doc = line,Clean = False).get_word_count()
-        Net_Count.update(count)
-    with open('dumped_counts','wb') as f:
-        pickle.dump(Net_Count,f)    
-    return Net_Count            
             
 def vocab_to_int(count_dump_file):
     """Function for encoding word using integer.Uses count of each words in whole file.Dumps encoding for each word in a dictionary
@@ -215,12 +164,13 @@ def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
     whole_feature = []
     whole_label = []
     whole = {}
+    cln = TextProcessor()
     with open(vocab_to_int_dump, 'rb') as f:
         vocab_to_int_dict = pickle.load(f)
         with open(filename,'r',encoding = encoding) as f1:
             lines = csv.reader(f1)
             for line in tqdm(lines):
-                whole_feature.append(TextProcessor(doc = line[0],Clean = False).encode_words(vocab_to_int_dict))
+                whole_feature.append(cln.filter(doc = line[0],Clean = False).encode_words(vocab_to_int_dict))
                 whole_label.append(int(line[1]))
             with open('encoded_wrds_labels','wb') as f2:
                 whole['feature'] = whole_feature
@@ -230,31 +180,34 @@ def encode_text(vocab_to_int_dump,filename,encoding = "ISO-8859-1"):
     
     
 
-def center_word_context_word_extractor(encoded_dump,window_size):
-    """Function for preprocessing word embedding data
-    write center word and corresponding context word to file
+# def center_word_context_word_extractor(encoded_dump,window_size):
+#     """Function for preprocessing word embedding data
+#     write center word and corresponding context word to file
+# 
+#     Parameters
+#     ----------
+#     encoded_dump : pickle file
+#         encoded string list
+#     window_size : integer
+#         Size of window
+# 
+# 
+# 
+# 
+#     """
+#     final = []
+#     with open(encoded_dump, 'rb') as f:
+#         whole = pickle.load(f)
+#     with open('skipgram_context.txt','w') as f1:
+#         for encoded_sentence in tqdm(whole['feature']):
+#             out = skipgram(window_size,encoded_sentence)
+#             if out is not None:
+#                 json_string = json.dumps(out) + '\n'
+#                 f1.write(json_string)
+#     return 0
+
     
-    Parameters
-    ----------
-    encoded_dump : pickle file
-        encoded string list
-    window_size : integer
-        Size of window
-
- 
     
-
-    """
-    final = []
-    with open(encoded_dump, 'rb') as f:
-        whole = pickle.load(f)
-    with open('skipgram_context.txt','w') as f1:
-        for encoded_sentence in tqdm(whole['feature']):
-            out = skipgram(window_size,encoded_sentence)
-            if out is not None:
-                json_string = json.dumps(out) + '\n'
-                f1.write(json_string)
-
 def reverse_vocab_to_int(vocab_to_int_dump):
     """Reversing vocab to int mapping to create  int to vocab mapping
 
@@ -263,11 +216,6 @@ def reverse_vocab_to_int(vocab_to_int_dump):
     vocab_to_int_dump : Pickle dump 
         Pickle dump of vocabulary to integer mapping
 
-    Returns
-    -------
-    type Dictionary
-        Integer to vocabulary mapping
-
     """
     with open(vocab_to_int_dump,'rb') as f:
         vocab_to_int = pickle.load(f)
@@ -275,5 +223,13 @@ def reverse_vocab_to_int(vocab_to_int_dump):
     with open('int_to_vocab','wb') as f1:
         pickle.dump(int_to_vocab,f1)
 
-
-                    
+    return 0
+    
+    
+    
+                """ Recently I came across Gensim package.It is super easy to create word embeddings with gensim.Also there a word embedding using very large data set.So I decided 
+                to use the pretrained word embedding models.
+                """    
+                
+                
+                
